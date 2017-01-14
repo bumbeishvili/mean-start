@@ -18,8 +18,8 @@ app.engine('html', require('ejs').renderFile);
 
 
 //Set Static Folder
-
-app.use(express.static(path.join(__dirname, 'client')));
+var staticFilesPath = express.static(path.join(__dirname, 'client'));
+app.use(staticFilesPath);
 
 
 //Body Parse MD
@@ -30,7 +30,8 @@ app.use('/', index);
 app.use('/api', tasks);
 
 
-app.listen(port,function(){
-    console.log('server started on port '+ port);
+app.listen(port, function () {
+    console.log('server started on port ' + port);
+    console.log('static folder ' + staticFilesPath);
 })
 
