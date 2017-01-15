@@ -32,6 +32,5 @@ app.use('/api', tasks);
 
 app.listen(port, function () {
     console.log('server started on port ' + port);
-    console.log('static folder ' + staticFilesPath);
 })
 

@@ -34,7 +34,7 @@ router.get('/tasks/:id', function (req, resp, next) {
 //Save Task
 router.post('/task', function (req, resp, next) {
     var task = req.body;
-    if (!task.title || (task.isDone + '')) {
+    if (!task.title || !(task.isDone + '')) {
         res.status(400);
         res.json({
             "error": "Bad Data"
@@ -66,7 +66,7 @@ router.delete('/tasks/:id', function (req, resp, next) {
 
 //Update
 router.put('/tasks/:id', function (req, resp, next) {
-    var task = req.bodyl
+    var task = req.body;
     var updatedTask = {};
 
     if (task.isDone) {
@@ -76,7 +76,7 @@ router.put('/tasks/:id', function (req, resp, next) {
     if (task.title) {
         updatedTask.title = task.title;
     }
-
+    console.log(updatedTask);
     if (!updatedTask) {
         resp.status(400);
         res.json({
