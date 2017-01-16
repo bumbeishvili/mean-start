@@ -9,7 +9,7 @@ export class TaskService {
         console.log('Task Service Initialised ...');
     }
     getTasks() {
-        return this.http.get('http://localhost:3000/api/tasks')
+        return this.http.get('/api/tasks')
             .map(res => {
                 console.log('got ', res.json());
                 return res.json();

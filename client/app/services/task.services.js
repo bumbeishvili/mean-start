@@ -17,7 +17,7 @@ var TaskService = (function () {
         console.log('Task Service Initialised ...');
     }
     TaskService.prototype.getTasks = function () {
-        return this.http.get('http://localhost:3000/api/tasks')
+        return this.http.get('/api/tasks')
             .map(function (res) {
             console.log('got ', res.json());
             return res.json();
