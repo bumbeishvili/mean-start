@@ -18,6 +18,7 @@
   "homepage": "https://github.com/bumbeishvili/mean-start#readme",
   "dependencies": {
     "body-parser": "^1.15.2",
+    "d3": "^4.4.4",
     "ejs": "^2.5.5",
     "express": "^4.14.0",
     "mongojs": "^2.4.0",
