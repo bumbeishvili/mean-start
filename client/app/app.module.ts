@@ -4,7 +4,7 @@ import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
 import { TasksComponent } from './components/tasks/tasks.component';
 import { PieComponent } from './components/pie/pie.component';
-import {FormsModule} from '@angular/forms';
+import { FormsModule} from '@angular/forms';
 
 @NgModule({
     imports: [BrowserModule, HttpModule,FormsModule],
