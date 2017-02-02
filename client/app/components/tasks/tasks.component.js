@@ -33,9 +33,11 @@ var TasksComponent = (function () {
             .subscribe(function (tasks) {
             console.log(tasks);
             _this.tasks = tasks;
+            _this.taskService.tasksUpdated.emit(_this.tasks);
         });
     }
     TasksComponent.prototype.updateStatus = function (task) {
+        var _this = this;
         var _task = {
             _id: task._id,
             title: task.title,
@@ -44,6 +46,8 @@ var TasksComponent = (function () {
         this.taskService.updateStatus(_task)
             .subscribe(function (data) {
             task.isDone = !task.isDone;
+            console.log('updated inside tasks component');
+            _this.taskService.tasksUpdated.emit(_this.tasks);
         });
     };
     TasksComponent.prototype.addTask = function (event) {
@@ -51,6 +55,7 @@ var TasksComponent = (function () {
         event.preventDefault();
         console.log(this.title);
         var newTask = {
+            _id: null,
             title: this.title,
             isDone: false
         };
@@ -58,15 +63,18 @@ var TasksComponent = (function () {
             .subscribe(function (savedTask) {
             _this.tasks.push(savedTask);
             _this.title = '';
+            _this.taskService.tasksUpdated.emit(_this.tasks);
         });
     };
     TasksComponent.prototype.deleteTask = function (id) {
+        var _this = this;
         var tasks = this.tasks;
         this.taskService.deleteTask(id).subscribe(function (data) {
             if (data.n == 1) {
                 for (var i = 0; i < tasks.length; i++) {
                     if (tasks[i]._id == id) {
                         tasks.splice(i, 1);
+                        _this.taskService.tasksUpdated.emit(_this.tasks);
                     }
                 }
             }

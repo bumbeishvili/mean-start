@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter } from '@angular/core';
 import { TaskService } from '../../services/task.services';
 import { Task } from '../../../Task';
 
@@ -21,20 +21,28 @@ export class TasksComponent {
         this.taskService.updateStatus(_task)
             .subscribe(data => {
                 task.isDone = !task.isDone;
+                console.log('updated inside tasks component');
+                this.taskService.tasksUpdated.emit(this.tasks);
             })
     }
+
+
 
     addTask(event: any) {
         event.preventDefault();
         console.log(this.title);
-        var newTask = {
+
+        var newTask: Task = {
+            _id: null,
             title: this.title,
             isDone: false
         }
+
         this.taskService.addTask(newTask)
             .subscribe(savedTask => {
                 this.tasks.push(savedTask);
-                this.title='';
+                this.title = '';
+                this.taskService.tasksUpdated.emit(this.tasks);
             })
 
     }
@@ -45,6 +53,7 @@ export class TasksComponent {
                 for (var i = 0; i < tasks.length; i++) {
                     if (tasks[i]._id == id) {
                         tasks.splice(i, 1);
+                        this.taskService.tasksUpdated.emit(this.tasks);
                     }
                 }
             }
@@ -72,6 +81,7 @@ export class TasksComponent {
             .subscribe(tasks => {
                 console.log(tasks);
                 this.tasks = tasks;
+                this.taskService.tasksUpdated.emit(this.tasks);
             });
     }
 }

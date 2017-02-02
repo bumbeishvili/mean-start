@@ -1,10 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { Http, Headers } from '@angular/http';
 import 'rxjs/add/operator/map';
 import { Task } from '../../Task';
 
 @Injectable()
 export class TaskService {
+    public tasks: Task[] = [];
+    public tasksUpdated: EventEmitter<Task[]> = new EventEmitter();
+
     constructor(private http: Http) {
         console.log('Task Service Initialised ...');
     }
@@ -12,13 +15,17 @@ export class TaskService {
         return this.http.get('/api/tasks')
             .map(res => {
                 console.log('got ', res.json());
-                return res.json();
+                this.tasks = res.json();
+                return this.tasks;
             });
     }
 
     addTask(newTask: Task) {
         var headers = new Headers();
         headers.append("Content-Type", "application/json");
+
+        
+
         return this.http
             .post('/api/task', JSON.stringify(newTask), { headers: headers })
             .map(res => res.json());
@@ -34,7 +41,7 @@ export class TaskService {
         var headers = new Headers();
         headers.append("Content-Type", "application/json");
         return this.http
-            .put('/api/tasks/'+task._id, JSON.stringify(task), { headers: headers })
+            .put('/api/tasks/' + task._id, JSON.stringify(task), { headers: headers })
             .map(res => res.json());
     }
 }

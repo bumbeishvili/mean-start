@@ -14,13 +14,17 @@ require('rxjs/add/operator/map');
 var TaskService = (function () {
     function TaskService(http) {
         this.http = http;
+        this.tasks = [];
+        this.tasksUpdated = new core_1.EventEmitter();
         console.log('Task Service Initialised ...');
     }
     TaskService.prototype.getTasks = function () {
+        var _this = this;
         return this.http.get('/api/tasks')
             .map(function (res) {
             console.log('got ', res.json());
-            return res.json();
+            _this.tasks = res.json();
+            return _this.tasks;
         });
     };
     TaskService.prototype.addTask = function (newTask) {

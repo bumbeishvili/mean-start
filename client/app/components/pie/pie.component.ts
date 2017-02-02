@@ -10,6 +10,7 @@ import { Task } from '../../../Task';
 })
 
 export class PieComponent {
+  drew = false;
   tasks: Task[];
   dom: any = document.body;
   elementRef: ElementRef;
@@ -17,11 +18,11 @@ export class PieComponent {
   constructor(elementRef: ElementRef, private renderer: Renderer, private taskService: TaskService) {
     this.elementRef = elementRef;
 
-
-
   }
 
-
+  onChanges() {
+    console.log('changed')
+  }
   ngOnInit() {
     this.chartInit();
   }
@@ -35,30 +36,81 @@ export class PieComponent {
     var width, height
     var chartWidth, chartHeight
     var margin
-    var svg = d3.select(this.elementRef.nativeElement).select("#pieChartContainer").append("svg")
-    var chartLayer = svg.append("g").classed("chartLayer", true)
-
-    this.taskService
-      .getTasks()
-      .subscribe(tasks => {
-        console.log(tasks);
-        this.tasks = tasks;
-
-        var doneTasks = tasks.filter((t: Task) => t.isDone);
+    var svg = d3.select(this.elementRef.nativeElement)
+      .select("#pieChartContainer")
+      .append("svg")
 
 
-        console.log(tasks);
 
-        main([{
-          name: "Done",
-          value: doneTasks.length
-        },
-        {
-          name: "Not Done",
-          value: tasks.length - doneTasks.length
-        }]);
 
-      });
+    var chartLayer = svg.append("g")
+      .classed("chartLayer", true)
+
+    var arc = d3.arc()
+      .padAngle(0.03)
+      .cornerRadius(8)
+
+
+    var pie = d3.pie()
+      .sort(null)
+      .value(function (d) { return d.value; })
+
+    // this.taskService
+    //   .getTasks()
+    //   .subscribe(tasks => {
+    //     console.log(tasks);
+    //     this.tasks = tasks;
+
+    //     var doneTasks = tasks.filter((t: Task) => t.isDone);
+
+    //     console.log(tasks);
+
+    //     main([{
+    //       name: "Done",
+    //       value: doneTasks.length
+    //     },
+    //     {
+    //       name: "Not Done",
+    //       value: tasks.length - doneTasks.length
+    //     }]);
+
+    //   });
+
+    this.taskService.tasksUpdated.subscribe((updatedTasks: Task[]) => {
+      console.log('task changed inside pie component')
+
+      this.tasks = updatedTasks;
+
+      var doneTasks = this.tasks.filter((t: Task) => t.isDone);
+
+      console.log(this.tasks);
+
+      var newData = [{
+        name: "Done",
+        value: doneTasks.length
+      },
+      {
+        name: "Not Done",
+        value: this.tasks.length - doneTasks.length
+      }];
+
+
+      if (this.drew) {
+        console.log("minor");
+        redrawChart(newData);
+
+      } else {
+        console.log("main");
+        main(newData);
+      }
+
+
+      this.drew = true;
+
+    });
+
+
+
 
 
 
@@ -82,7 +134,12 @@ export class PieComponent {
       chartWidth = width - (margin.left + margin.right)
       chartHeight = height - (margin.top + margin.bottom)
 
-      svg.attr("width", width).attr("height", height)
+      arc = arc
+        .outerRadius(chartHeight / 2)
+        .innerRadius(chartHeight / 4)
+
+      svg.attr("width", width).attr("height", height);
+
 
 
       chartLayer
@@ -92,20 +149,34 @@ export class PieComponent {
 
 
     }
+    function redrawChart(newData: Task[]) {
+      debugger;
+      svg.selectAll('.arc')
+        .data(pie(newData))
+        .select('path')
+        .transition()
+        .duration(700)
+        .attrTween('d', arcTween)
+
+    }
+
+    function arcTween(a) {
+      debugger;
+      var i = d3.interpolate(this._current, a);
+      this._current = i(0);
+      return function (t) {
+        var result = arc(i(t));
+        console.log(result);
+        return result;
+      };
+    }
+
 
     function drawChart(data) {
-      //pieチャート用のデータセットを生成する
-      var arcs = d3.pie()
-        .sort(null)
-        .value(function (d) { return d.value; })
-        (data)
 
 
-      var arc = d3.arc()
-        .outerRadius(chartHeight / 2)
-        .innerRadius(chartHeight / 4)
-        .padAngle(0.03)
-        .cornerRadius(8)
+
+      var arcs = pie(data);
 
       var pieG = chartLayer.selectAll("g")
         .data([data])
@@ -124,6 +195,7 @@ export class PieComponent {
         .attr("id", function (d, i) { return "arc-" + i })
         .attr("stroke", "gray")
         .attr("fill", function (d, i) { return d3.interpolateCool(Math.random()) })
+        .each(function (d) { this._current = d; });
 
 
       newBlock.append("text")
@@ -134,5 +206,6 @@ export class PieComponent {
         .text(function (d) { console.log(d); return d.data.name })
     }
   }
+}
 
 }
